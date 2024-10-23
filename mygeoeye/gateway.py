@@ -21,12 +21,7 @@ def handle_cliente(cliente_socket):
             nome_imagem = cliente_socket.recv(CHUNK_SIZE).decode('utf-8')
             print(f"Nome da imagem para upload: {nome_imagem}")
             temp_name = str(uuid.uuid4())
-            with open(temp_name, "wb") as f:
-                while True:
-                    chunk = cliente_socket.recv(CHUNK_SIZE)
-                    if chunk == EOF_MARKER:
-                        break
-                    f.write(chunk)
+            receber_arquivo_em_chunks(cliente_socket, temp_name)
 
             for nodo in NODES:
                 ip, porta = nodo.split(":")
@@ -39,7 +34,7 @@ def handle_cliente(cliente_socket):
             os.remove(temp_name)
 
             imagens[nome_imagem] = NODES
-            cliente_socket.sendall(b"UPLOAD SUCCESS")
+            cliente_socket.sendall("UPLOAD SUCCESS".encode('utf-8'))
 
         elif comando == "LIST":
             if (bool(imagens)):
@@ -55,7 +50,7 @@ def handle_cliente(cliente_socket):
                 nodo = next(round_robin)
                 cliente_socket.sendall(nodo.encode('utf-8'))
             else:
-                cliente_socket.sendall(b"IMAGE NOT FOUND")
+                cliente_socket.sendall("IMAGE NOT FOUND".encode('utf-8'))
 
         elif comando == "DELETE":
             nome_imagem = cliente_socket.recv(CHUNK_SIZE).decode('utf-8')
@@ -69,12 +64,12 @@ def handle_cliente(cliente_socket):
                     nodo_socket.close()
 
                 del imagens[nome_imagem]
-                cliente_socket.sendall(b"DELETE SUCCESS")
+                cliente_socket.sendall("DELETE SUCCESS".encode('utf-8'))
             else:
-                cliente_socket.sendall(b"IMAGE NOT FOUND")
+                cliente_socket.sendall("IMAGE NOT FOUND".encode('utf-8'))
 
         else:
-            cliente_socket.sendall(b"INVALID COMMAND")
+            cliente_socket.sendall("INVALID COMMAND".encode('utf-8'))
 
 def servidor():
     servidor_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
