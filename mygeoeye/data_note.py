@@ -9,7 +9,7 @@ NODO_PORTA = 5003
 
 def handle_nodo(nodo_socket):
     try:
-        comando = nodo_socket.recv(CHUNK_SIZE).decode('utf-8')
+        comando = receber_str(nodo_socket)
         print(f"Comando recebido: {comando}")
 
         if comando.startswith("STORE"):
