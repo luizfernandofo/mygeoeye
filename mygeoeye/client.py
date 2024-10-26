@@ -2,13 +2,15 @@ import socket
 import os
 from shared import *
 import threading
+import time
+
 # Constantes
 SERVER_IP = "127.0.0.1"
 SERVER_PORT = 5000
+IMG_PER_SEC = 10
 
 def cliente(comando: str, image_name: str):
     cliente_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    print(comando,image_name)
     cliente_socket.connect((SERVER_IP, SERVER_PORT))
     
         #comando = input("Digite o comando (UPLOAD, LIST, DOWNLOAD, DELETE, QUIT): ").strip().upper()
@@ -23,27 +25,27 @@ def cliente(comando: str, image_name: str):
         
         if image_name in arquivos:
             # Caminho completo do arquivo
-            cliente_socket.sendall(comando.encode('utf-8'))
+            enviar_str(cliente_socket, comando)
             arquivo_path = os.path.join(images_dir, image_name)
-            cliente_socket.sendall(image_name.encode('utf-8'))
+            enviar_str(cliente_socket, image_name)
             enviar_arquivo_em_chunks(cliente_socket, arquivo_path)
-            resposta = cliente_socket.recv(CHUNK_SIZE).decode('utf-8')
+            resposta = receber_str(cliente_socket)
             print(resposta)
             
         else:
             print("Arquivo não encontrado na lista disponível.")
 
     elif comando == "LIST":
-        cliente_socket.sendall(comando.encode('utf-8'))
-        resposta = cliente_socket.recv(CHUNK_SIZE).decode('utf-8')
+        enviar_str(cliente_socket, comando)
+        resposta = receber_str(cliente_socket)
         print("Imagens disponíveis:\n", resposta)
 
     elif comando == "DOWNLOAD":
-        cliente_socket.sendall(comando.encode('utf-8'))
+        enviar_str(cliente_socket, comando)
         nome_imagem = input("Digite o nome da imagem a baixar: ").strip()
-        cliente_socket.sendall(nome_imagem.encode('utf-8'))
+        enviar_str(cliente_socket, nome_imagem)
 
-        nodo = cliente_socket.recv(CHUNK_SIZE).decode('utf-8')
+        nodo = receber_str(cliente_socket)
         if nodo == "IMAGE NOT FOUND":
             print("Imagem não encontrada.")
         else:
@@ -52,29 +54,40 @@ def cliente(comando: str, image_name: str):
             nodo_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             nodo_socket.connect((ip_nodo, int(porta_nodo)))
 
-            nodo_socket.sendall(f"DOWNLOAD {nome_imagem}".encode('utf-8'))
+            enviar_str(cliente_socket, f"DOWNLOAD {nome_imagem}")
             receber_arquivo_em_chunks(nodo_socket, f"baixado_{nome_imagem}")
             print(f"Imagem '{nome_imagem}' baixada com sucesso.")
             nodo_socket.close()
 
     elif comando == "DELETE":
-        cliente_socket.sendall(comando.encode('utf-8'))
+        enviar_str(cliente_socket, comando)
         nome_imagem = input("Digite o nome da imagem a deletar: ").strip()
-        cliente_socket.sendall(nome_imagem.encode('utf-8'))
+        enviar_str(cliente_socket, nome_imagem)
 
-        resposta = cliente_socket.recv(CHUNK_SIZE).decode('utf-8')
+        resposta = receber_str(cliente_socket)
         print(resposta)
 
     elif comando == "QUIT":
-        cliente_socket.close()
-    
+        enviar_str(cliente_socket, comando)
 
     else:
         print("Comando inválido!")
-    cliente_socket.close()
+    enviar_str(cliente_socket, "QUIT")
 
 def main():
-    threading.Thread(target=cliente, args=('UPLOAD', 'a.png')).start()
+    tempo_inicio = time.time_ns()
+    threads = []
+    for i in range(IMG_PER_SEC):
+        t = threading.Thread(target=cliente, args=('UPLOAD', 'img.tif'))
+        t.start()
+        threads.append(t)
+    
+    for t in threads:
+        t.join()
+
+    tempo_fim = time.time_ns()
+    tempo_gasto = tempo_fim - tempo_inicio
+    print(f"Tempo total de execução: {tempo_gasto * 10**-6:.2f} ms.")
 
 if __name__ == '__main__':
     main()
