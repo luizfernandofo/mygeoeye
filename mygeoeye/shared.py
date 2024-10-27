@@ -1,5 +1,7 @@
 import socket
 
+FATOR_REPLICA = 2
+
 ENCODING = 'utf-8'
 EOF_MARKER = b"EOF"  # Indicador de fim de arquivo
 CHUNK_DATA_SIZE = 1024 * 1024  # Tamanho dos chunks de dados em bytes

@@ -44,10 +44,10 @@ def cliente(comando: str, image_name: str):
 
     elif comando == "DOWNLOAD":
         enviar_str(cliente_socket, comando)
-        nome_imagem = input("Digite o nome da imagem a baixar: ").strip()
-        enviar_str(cliente_socket, nome_imagem)
+        enviar_str(cliente_socket, image_name)
 
         nodo = receber_str(cliente_socket)
+        
         if nodo == "IMAGE NOT FOUND":
             print("Imagem não encontrada.")
         else:
@@ -56,15 +56,14 @@ def cliente(comando: str, image_name: str):
             nodo_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             nodo_socket.connect((ip_nodo, int(porta_nodo)))
 
-            enviar_str(cliente_socket, f"DOWNLOAD {nome_imagem}")
-            receber_arquivo_em_chunks(nodo_socket, f"baixado_{nome_imagem}")
-            print(f"Imagem '{nome_imagem}' baixada com sucesso.")
+            enviar_str(nodo_socket, f"DOWNLOAD {image_name}")
+            receber_arquivo_em_chunks(nodo_socket, f"baixado_{image_name}")
+            print(f"Imagem '{image_name}' baixada com sucesso.")
             nodo_socket.close()
 
     elif comando == "DELETE":
         enviar_str(cliente_socket, comando)
-        nome_imagem = input("Digite o nome da imagem a deletar: ").strip()
-        enviar_str(cliente_socket, nome_imagem)
+        enviar_str(cliente_socket, image_name)
 
         resposta = receber_str(cliente_socket)
         print(resposta)
