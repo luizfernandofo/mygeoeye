@@ -7,7 +7,7 @@ import time
 # Constantes
 SERVER_IP = "127.0.0.1"
 SERVER_PORT = 5000
-IMG_PER_SEC = 10
+IMG_PER_SEC = 30
 
 def cliente(comando: str, image_name: str):
     if not os.path.isdir('images'):
@@ -47,7 +47,7 @@ def cliente(comando: str, image_name: str):
         enviar_str(cliente_socket, image_name)
 
         nodo = receber_str(cliente_socket)
-        
+
         if nodo == "IMAGE NOT FOUND":
             print("Imagem não encontrada.")
         else:
@@ -76,10 +76,11 @@ def cliente(comando: str, image_name: str):
     enviar_str(cliente_socket, "QUIT")
 
 def main():
+    cliente("UPLOAD", "img.tif")
     tempo_inicio = time.time_ns()
     threads = []
     for i in range(IMG_PER_SEC):
-        t = threading.Thread(target=cliente, args=('UPLOAD', 'img.tif'))
+        t = threading.Thread(target=cliente, args=('DOWNLOAD', 'img.tif'))
         t.start()
         threads.append(t)
     
