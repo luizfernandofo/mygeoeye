@@ -6,6 +6,7 @@ from shared import *
 # Constantes
 NODO_IP = "127.0.0.1"
 NODO_PORTA = 5003
+NOME_PASTA_IMAGENS = "data"
 
 def handle_nodo(nodo_socket):
     try:
@@ -16,21 +17,21 @@ def handle_nodo(nodo_socket):
             _, nome_imagem = comando.split()
             print(f"Armazenando {nome_imagem}...")
 
-            receber_arquivo_em_chunks(nodo_socket, f"data/{nome_imagem}")
+            receber_arquivo_em_chunks(nodo_socket, f"{NOME_PASTA_IMAGENS}/{nome_imagem}")
             print(f"{nome_imagem} armazenada com sucesso.")
 
         elif comando.startswith("DOWNLOAD"):
             _, nome_imagem = comando.split()
-            if os.path.exists(f"data/{nome_imagem}"):
-                enviar_arquivo_em_chunks(nodo_socket, f"data/{nome_imagem}")
+            if os.path.exists(f"{NOME_PASTA_IMAGENS}/{nome_imagem}"):
+                enviar_arquivo_em_chunks(nodo_socket, f"{NOME_PASTA_IMAGENS}/{nome_imagem}")
                 print(f"{nome_imagem} enviada com sucesso.")
             else:
                 print("Imagem não encontrada.")
 
         elif comando.startswith("DELETE"):
             _, nome_imagem = comando.split()
-            if os.path.exists(f"data/{nome_imagem}"):
-                os.remove(f"data/{nome_imagem}")
+            if os.path.exists(f"{NOME_PASTA_IMAGENS}/{nome_imagem}"):
+                os.remove(f"{NOME_PASTA_IMAGENS}/{nome_imagem}")
                 print(f"{nome_imagem} deletada com sucesso.")
             else:
                 print("Imagem não encontrada.")
@@ -38,8 +39,8 @@ def handle_nodo(nodo_socket):
         nodo_socket.close()        
 
 def nodo():
-    if not os.path.isdir('data'):
-        os.makedirs('data')
+    if not os.path.isdir(NOME_PASTA_IMAGENS):
+        os.makedirs(NOME_PASTA_IMAGENS)
 
     nodo_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     nodo_socket.bind((NODO_IP, NODO_PORTA))
