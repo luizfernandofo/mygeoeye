@@ -1,6 +1,7 @@
 import socket
 
-FATOR_REPLICA = 2
+FATOR_REPLICA = 1
+CONN_LISTEN_LIMIT = 10
 
 ENCODING = 'utf-8'
 EOF_MARKER = b"EOF"  # Indicador de fim de arquivo
@@ -35,12 +36,12 @@ def receber_arquivo_em_chunks(_conn, arquivo_path):
             # Verifica se o chunk contém o EOF_MARKER
             if chunk.endswith(EOF_MARKER):
                 f.write(chunk[:-len(EOF_MARKER)])  # Grava o chunk sem o EOF
-                print("EOF recebido, finalizando o recebimento.")
+                #print("EOF recebido, finalizando o recebimento.")
                 break
             
             f.write(chunk)  # Escreve o chunk no arquivo
 
-    print(f"Arquivo '{arquivo_path}' recebido e armazenado com sucesso.")
+    #print(f"Arquivo '{arquivo_path}' recebido e armazenado com sucesso.")
 
 # Função para enviar arquivo ao servidor em chunks
 def enviar_arquivo_em_chunks(_conn, arquivo_path):

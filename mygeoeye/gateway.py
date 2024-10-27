@@ -98,7 +98,7 @@ def handle_cliente(cliente_socket):
 def servidor():
     servidor_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     servidor_socket.bind(("127.0.0.1", 5000))
-    servidor_socket.listen(5)
+    servidor_socket.listen(CONN_LISTEN_LIMIT)
     print("Servidor aguardando conexões...")
 
     while True:

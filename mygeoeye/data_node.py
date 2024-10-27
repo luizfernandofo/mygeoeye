@@ -44,7 +44,7 @@ def nodo():
 
     nodo_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     nodo_socket.bind((NODO_IP, NODO_PORTA))
-    nodo_socket.listen(5)
+    nodo_socket.listen(CONN_LISTEN_LIMIT)
     print(f"Nó de dados {NODO_IP}:{NODO_PORTA} aguardando conexões...")
 
     while True:
