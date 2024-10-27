@@ -38,6 +38,9 @@ def handle_nodo(nodo_socket):
         nodo_socket.close()        
 
 def nodo():
+    if not os.path.isdir('data'):
+        os.makedirs('data')
+
     nodo_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     nodo_socket.bind((NODO_IP, NODO_PORTA))
     nodo_socket.listen(5)

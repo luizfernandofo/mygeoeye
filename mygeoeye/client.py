@@ -10,6 +10,8 @@ SERVER_PORT = 5000
 IMG_PER_SEC = 10
 
 def cliente(comando: str, image_name: str):
+    if not os.path.isdir('images'):
+        os.makedirs('images')
     cliente_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     cliente_socket.connect((SERVER_IP, SERVER_PORT))
     
